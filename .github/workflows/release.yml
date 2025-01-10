@@ -36,7 +36,7 @@ jobs:
       matrix:
         os:
           - linux
-          - darwin
+          # - darwin
         arch:
           - amd64
           - arm64
