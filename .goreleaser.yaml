@@ -12,16 +12,6 @@ builds:
       - linux
       - darwin
 
-dockers:
-  - id: my-container
-    image_templates:
-      - "clover0/slsa-test:{{ .Version }}"
-    dockerfile: Dockerfile
-    goos: linux
-    goarch:
-      - amd64
-      - arm64
-
 archives:
   - format: tar.gz
     name_template: >-
