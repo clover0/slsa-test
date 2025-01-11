@@ -5,10 +5,14 @@ on:
     tags:
       - 'v*'
 
+permissions:
+
 jobs:
   build:
     permissions:
       contents: write
+      id-token: write
+      attestations: write
     outputs:
       hashes: ${{ steps.binary.outputs.hashes }}
 #      image: ${{ steps.image.outputs.name }}
@@ -40,10 +44,19 @@ jobs:
           ARTIFACTS: "${{ steps.goreleaser.outputs.artifacts }}"
         run: |
           set -euo pipefail
-
+          
+          echo $ARTIFACTS
+          
           checksum_file=$(echo "$ARTIFACTS" | jq -r '.[] | select (.type=="Checksum") | .path')
           echo "hashes=$(cat $checksum_file | base64 -w0)" >> "$GITHUB_OUTPUT"
 
+      - uses: actions/attest-build-provenance@7668571508540a607bdfd90a87a560489fe372eb # v2.1.0
+        with:
+          subject-path: |
+            dist/*.tar.gz
+            dist/*.txt
+            dist/*.pem
+            dist/*.sig
 #      - name: Image digest
 #        id: image
 #        env:
