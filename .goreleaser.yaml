@@ -17,6 +17,21 @@ builds:
       - amd64
       - arm64
 
+dockers:
+  - id: slsa-test-amd64
+    image_templates:
+      - "clover0/slsa-test:latest"
+      - "clover0/slsa-test:{{ .Tag }}"
+    use: buildx
+    goos: linux
+    goarch: amd64
+    dockerfile: Dockerfile
+    build_flag_templates:
+      - --platform=linux/amd64
+      - --label=org.opencontainers.image.title={{ .ProjectName }}
+      - --label=org.opencontainers.image.version={{ .Version }}
+      - --label=org.opencontainers.image.revision={{ .FullCommit }}
+
 signs:
   - cmd: cosign
     artifacts: checksum
