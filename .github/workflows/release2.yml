@@ -27,6 +27,10 @@ jobs:
         with:
           go-version: 1.23
 
+      - uses: sigstore/cosign-installer@v3.7.0
+        with:
+          cosign-release: 'v2.4.1'
+
       - name: RUN GoReleaser
         id: goreleaser
         uses: goreleaser/goreleaser-action@9ed2f89a662bf1735a48bc8557fd212fa902bebf # v6.1.0
