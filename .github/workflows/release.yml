@@ -1,11 +1,11 @@
 name: Release Binaly
 
-on:
-  push:
-    tags:
-      - 'v*'
-    branches:
-      - 'release/**'
+#on:
+#  push:
+#    tags:
+#      - 'v*'
+#    branches:
+#      - 'release/**'
 
 jobs:
   args:
