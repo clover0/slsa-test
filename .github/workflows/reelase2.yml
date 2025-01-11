@@ -9,6 +9,8 @@ on:
 
 jobs:
   build:
+    permissions:
+      contents: write
     outputs:
       hashes: ${{ steps.binary.outputs.hashes }}
 #      image: ${{ steps.image.outputs.name }}
