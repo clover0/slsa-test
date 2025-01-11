@@ -1,4 +1,5 @@
 version: 2
+project_name: slsa-test
 
 before:
   hooks:
@@ -8,9 +9,13 @@ builds:
   - env:
       - CGO_ENABLED=0
     main: ./cmd/main.go
+    binary: slsa-test
     goos:
       - linux
       - darwin
+    goarch:
+      - amd64
+      - arm64
 
 archives:
   - format: tar.gz
