@@ -1,8 +1,7 @@
 package main
 
-import "fmt"
+import "slsa-test/pkg/hello"
 
 func main() {
-	fmt.Println("Hello, World!")
-	fmt.Println("This is a test.")
+	hello.Hello()
 }

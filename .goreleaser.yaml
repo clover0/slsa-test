@@ -28,10 +28,11 @@ dockers:
     goarch: amd64
     dockerfile: Dockerfile
     build_flag_templates:
-      - --platform=linux/amd64
-      - --label=org.opencontainers.image.title={{ .ProjectName }}
-      - --label=org.opencontainers.image.version={{ .Version }}
-      - --label=org.opencontainers.image.revision={{ .FullCommit }}
+      - "--platform=linux/amd64"
+      - "--label=org.opencontainers.image.created={{.Date}}"
+      - "--label=org.opencontainers.image.title={{.ProjectName}}"
+      - "--label=org.opencontainers.image.revision={{.FullCommit}}"
+      - "--label=org.opencontainers.image.version={{.Version}}"
 
 signs:
   - cmd: cosign
@@ -39,13 +40,13 @@ signs:
     certificate: ${artifact}.pem
     signature: ${artifact}.sig
     args:
-      - sign-blob
-      - --output-certificate=${certificate}
-      - --output-signature=${signature}
-      - --oidc-provider
-      - github
-      - ${artifact}
-      - --yes
+      - "sign-blob"
+      - "--output-certificate=${certificate}"
+      - "--output-signature=${signature}"
+      - "--oidc-provider"
+      - "github"
+      - "${artifact}"
+      - "--yes"
 
 archives:
   - format: tar.gz
