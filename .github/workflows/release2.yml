@@ -75,8 +75,8 @@ jobs:
       id-token: write
       packages: write
     outputs:
-      image: ${{ steps.image.outputs.name }}
-      digest: ${{ steps.image.outputs.digest }}
+      digest-amd64: ${{ steps.image-amd64.outputs.digest}}
+      digest-arm64: ${{ steps.image-arm64.outputs.digest }}
     runs-on: ubuntu-24.04
     steps:
       - uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683 # v4.2.2
@@ -108,31 +108,56 @@ jobs:
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
-      - name: Image digest
-        id: image
+      - name: Output amd64 digest
+        id: image-amd64
         env:
           ARTIFACTS: "${{ steps.goreleaser.outputs.artifacts }}"
         run: |
           set -euo pipefail
-          image_and_digest=$(echo "$ARTIFACTS" | jq -re '.[] | select (.type=="Docker Manifest") | .path')
-          image=$(echo "${image_and_digest}" | cut -d'@' -f1 | cut -d':' -f1)
-          digest=$(echo "${image_and_digest}" | cut -d'@' -f2)
-          echo "name=$image" >> "$GITHUB_OUTPUT"
-          echo $image
+          sha_digest=$(echo "$ARTIFACTS" |  jq -re 'first(.[] | select(.goarch == "amd64" and .type == "Published Docker Image")) | .extra.Digest')
+          echo sha_digest $sha_digest
+          digest=$(echo "${sha_digest}" | cut -d':' -f2)
+          echo digest $digest
           echo "digest=$digest" >> "$GITHUB_OUTPUT"
-          echo $digest
 
-#  provenance-image:
-#    needs: [ build-image ]
-#    permissions:
-#      actions: read
-#      id-token: write
-#      packages: write
-#    uses: slsa-framework/slsa-github-generator/.github/workflows/generator_container_slsa3.yml@v2.0.0
-#    with:
-#      image: ${{ needs.build-image.outputs.image }}
-#      digest: ${{ needs.build-image.outputs.digest }}
-#      registry-username: ${{ github.actor }}
-#      compile-generator: true
-#    secrets:
-#      registry-password: ${{ secrets.GITHUB_TOKEN }}
+      - name: Output arm64 digest
+        id: image-arm64
+        env:
+          ARTIFACTS: "${{ steps.goreleaser.outputs.artifacts }}"
+        run: |
+          set -euo pipefail
+          sha_digest=$(echo "$ARTIFACTS" |  jq -re 'first(.[] | select(.goarch == "arm64" and .type == "Published Docker Image")) | .extra.Digest')
+          echo sha_digest $sha_digest
+          digest=$(echo "${sha_digest}" | cut -d':' -f2)
+          echo digest $digest
+          echo "digest=$digest" >> "$GITHUB_OUTPUT"
+
+  provenance-image-amd64:
+    needs: [ build-image ]
+    permissions:
+      actions: read
+      id-token: write
+      packages: write
+    uses: slsa-framework/slsa-github-generator/.github/workflows/generator_container_slsa3.yml@v2.0.0
+    with:
+      image: ghcr.io/clover0/slsa-test
+      digest: ${{ needs.build-image.outputs.digest-amd64 }}
+      registry-username: clover0
+      compile-generator: true
+    secrets:
+      registry-password: ${{ secrets.GITHUB_TOKEN }}
+
+  provenance-image-arm64:
+    needs: [ build-image ]
+    permissions:
+      actions: read
+      id-token: write
+      packages: write
+    uses: slsa-framework/slsa-github-generator/.github/workflows/generator_container_slsa3.yml@v2.0.0
+    with:
+      image: ghcr.io/clover0/slsa-test
+      digest: ${{ needs.build-image.outputs.digest-amd64 }}
+      registry-username: clover0
+      compile-generator: true
+    secrets:
+      registry-password: ${{ secrets.GITHUB_TOKEN }}
