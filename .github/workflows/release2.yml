@@ -115,9 +115,9 @@ jobs:
           ARTIFACTS: "${{ steps.goreleaser.outputs.artifacts }}"
         run: |
           set -euo pipefail
-          image_and_tag=$(echo "$ARTIFACTS" | jq -er 'first(.[] | select (.goarch=="amd64" && .type=="Published Docker Image")) | .path')
+          image_and_tag=$(echo "$ARTIFACTS" | jq -er 'first(.[] | select (.goarch=="amd64" and .type=="Published Docker Image")) | .path')
           image=$(echo "${image_and_tag}" | cut -d':' -f1)
-          sha_digest=$(echo "$ARTIFACTS" |  jq -er 'first(.[] | select (.goarch=="amd64" && .type=="Published Docker Image")) | .extra.Digest')
+          sha_digest=$(echo "$ARTIFACTS" |  jq -er 'first(.[] | select (.goarch=="amd64" and .type=="Published Docker Image")) | .extra.Digest')
           echo "name=$image" >> "$GITHUB_OUTPUT"
           echo "digest=$sha_digest" >> "$GITHUB_OUTPUT"
 
@@ -127,9 +127,9 @@ jobs:
           ARTIFACTS: "${{ steps.goreleaser.outputs.artifacts }}"
         run: |
           set -euo pipefail
-          image_and_tag=$(echo "$ARTIFACTS" | jq -er 'first(.[] | select (.goarch=="arm64" && .type=="Published Docker Image")) | .path')
+          image_and_tag=$(echo "$ARTIFACTS" | jq -er 'first(.[] | select (.goarch=="arm64" and .type=="Published Docker Image")) | .path')
           image=$(echo "${image_and_tag}" | cut -d':' -f1)
-          sha_digest=$(echo "$ARTIFACTS" |  jq -er 'first(.[] | select (.goarch=="arm64" && .type=="Published Docker Image")) | .extra.Digest')
+          sha_digest=$(echo "$ARTIFACTS" |  jq -er 'first(.[] | select (.goarch=="arm64" and .type=="Published Docker Image")) | .extra.Digest')
           
           echo "name=$image" >> "$GITHUB_OUTPUT"
           echo "digest=$sha_digest" >> "$GITHUB_OUTPUT"
