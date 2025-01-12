@@ -1,15 +1,14 @@
 name: Release
 
 on:
-  push:
-    tags:
-      - "v*"
+  release:
+    types: [ created ]
 
 permissions: { }
 
 jobs:
   build-image:
-    if: github.ref == 'refs/heads/main'
+    if: github.event_name == 'release' && github.event.action == 'created'
     permissions:
       contents: write
       id-token: write
