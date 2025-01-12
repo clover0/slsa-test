@@ -91,6 +91,5 @@ archives:
       {{ .ProjectName }}_{{ .Os }}_{{ .Arch }}
       {{- if .Arm }}v{{ .Arm }}{{ end }}
 
-
-
 release:
+  prerelease: true
