@@ -76,7 +76,8 @@ jobs:
       packages: write
       attestations: write
     outputs:
-      digest: ${{ steps.image.outputs.digest}}
+      digest-amd64: ${{ steps.digest-amd64.outputs.digest}}
+      digest-arm64: ${{ steps.digest-arm64.outputs.digest}}
     runs-on: ubuntu-24.04
     steps:
       - uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683 # v4.2.2
@@ -108,25 +109,44 @@ jobs:
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
-      - name: Output digest
-        id: image
+      - name: Output AMD64 digest
+        id: digest-amd64
         env:
           ARTIFACTS: "${{ steps.goreleaser.outputs.artifacts }}"
         run: |
           set -euo pipefail
-          image_and_tag=$(echo "$ARTIFACTS" | jq -er '.[] | select (.type=="Docker Manifest") | .path')
+          image_and_tag=$(echo "$ARTIFACTS" | jq -er 'first(.[] | select (.goarch=="amd64" && .type=="Published Docker Image")) | .path')
           image=$(echo "${image_and_tag}" | cut -d':' -f1)
-          sha_digest=$(echo "$ARTIFACTS" |  jq -er '.[] | select (.type=="Docker Manifest") | .extra.Digest')
+          sha_digest=$(echo "$ARTIFACTS" |  jq -er 'first(.[] | select (.goarch=="amd64" && .type=="Published Docker Image")) | .extra.Digest')
+          echo "name=$image" >> "$GITHUB_OUTPUT"
+          echo "digest=$sha_digest" >> "$GITHUB_OUTPUT"
+
+      - name: Output ARM64 digest
+        id: digest-arm64
+        env:
+          ARTIFACTS: "${{ steps.goreleaser.outputs.artifacts }}"
+        run: |
+          set -euo pipefail
+          image_and_tag=$(echo "$ARTIFACTS" | jq -er 'first(.[] | select (.goarch=="arm64" && .type=="Published Docker Image")) | .path')
+          image=$(echo "${image_and_tag}" | cut -d':' -f1)
+          sha_digest=$(echo "$ARTIFACTS" |  jq -er 'first(.[] | select (.goarch=="arm64" && .type=="Published Docker Image")) | .extra.Digest')
+          
           echo "name=$image" >> "$GITHUB_OUTPUT"
           echo "digest=$sha_digest" >> "$GITHUB_OUTPUT"
 
       - uses: actions/attest-build-provenance@7668571508540a607bdfd90a87a560489fe372eb # v2.1.0
         with:
           subject-name: ghcr.io/clover0/slsa-test
-          subject-digest: ${{ steps.image.outputs.digest }}
+          subject-digest: ${{ steps.digest-amd64.outputs.digest }}
           push-to-registry: true
 
-  provenance-image:
+      - uses: actions/attest-build-provenance@7668571508540a607bdfd90a87a560489fe372eb # v2.1.0
+        with:
+          subject-name: ghcr.io/clover0/slsa-test
+          subject-digest: ${{ steps.digest-arm64.outputs.digest }}
+          push-to-registry: true
+
+  provenance-amd64:
     needs: [ build-image ]
     permissions:
       actions: read
@@ -135,7 +155,21 @@ jobs:
     uses: slsa-framework/slsa-github-generator/.github/workflows/generator_container_slsa3.yml@v2.0.0
     with:
       image: ghcr.io/clover0/slsa-test
-      digest: ${{ needs.build-image.outputs.digest }}
+      digest: ${{ needs.build-image.outputs.digest-amd64 }}
+      registry-username: clover0
+    secrets:
+      registry-password: ${{ secrets.GITHUB_TOKEN }}
+
+  provenance-arm64:
+    needs: [ build-image ]
+    permissions:
+      actions: read
+      id-token: write
+      packages: write
+    uses: slsa-framework/slsa-github-generator/.github/workflows/generator_container_slsa3.yml@v2.0.0
+    with:
+      image: ghcr.io/clover0/slsa-test
+      digest: ${{ needs.build-image.outputs.digest-arm64 }}
       registry-username: clover0
     secrets:
       registry-password: ${{ secrets.GITHUB_TOKEN }}

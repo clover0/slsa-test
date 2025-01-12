@@ -9,7 +9,6 @@ builds:
   - id: slsa-test
     env:
       - CGO_ENABLED=0
-      - GO111MODULE=on
     main: ./cmd/main.go
     binary: slsa-test
     goos:
@@ -38,7 +37,7 @@ dockers:
       - "--label=org.opencontainers.image.version={{.Version}}"
   - id: slsa-test-arm64
     image_templates:
-      - "ghcr.io/clover0/slsa-test-arm64:{{ .Tag }}"
+      - "ghcr.io/clover0/slsa-test-arm64v8:{{ .Tag }}"
     ids:
       - slsa-test
     use: buildx
@@ -46,7 +45,7 @@ dockers:
     goarch: arm64
     dockerfile: Dockerfile
     build_flag_templates:
-      - "--platform=linux/arm64"
+      - "--platform=linux/arm64/v8"
       - "--label=org.opencontainers.image.description={{.ProjectName}}"
       - "--label=org.opencontainers.image.created={{.Date}}"
       - "--label=org.opencontainers.image.title={{.ProjectName}}"
@@ -58,7 +57,7 @@ docker_manifests:
     id: slsa-test-mani
     image_templates:
       - "ghcr.io/clover0/slsa-test-amd64:{{ .Tag }}"
-      - "ghcr.io/clover0/slsa-test-arm64:{{ .Tag }}"
+      - "ghcr.io/clover0/slsa-test-arm64v8:{{ .Tag }}"
 
 signs:
   - cmd: cosign
