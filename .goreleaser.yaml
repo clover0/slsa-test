@@ -22,8 +22,8 @@ builds:
 dockers:
   - id: slsa-test-amd64
     image_templates:
-      - "clover0/slsa-test:latest"
-      - "clover0/slsa-test:{{ .Tag }}"
+      - "ghcr.io/clover0/slsa-test:latest"
+      - "ghcr.io/clover0/slsa-test:{{ .Tag }}"
     ids:
       - slsa-test
     use: buildx

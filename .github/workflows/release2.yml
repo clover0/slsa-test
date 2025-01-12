@@ -93,7 +93,7 @@ jobs:
         uses: docker/login-action@9780b0c442fbb1117ed29e0efdff1e18412f7567 # v3.3.0
         with:
           registry: ghcr.io
-          username: ${{ github.actor }}
+          username: clover0
           password: ${{ secrets.GITHUB_TOKEN }}
 
       - run: |
