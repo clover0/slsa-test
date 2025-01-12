@@ -114,23 +114,25 @@ jobs:
           ARTIFACTS: "${{ steps.goreleaser.outputs.artifacts }}"
         run: |
           set -euo pipefail
-          image_and_digest=$(echo "$ARTIFACTS" | jq -r '.[] | select (.type=="Docker Manifest") | .path')
+          image_and_digest=$(echo "$ARTIFACTS" | jq -re '.[] | select (.type=="Docker Manifest") | .path')
           image=$(echo "${image_and_digest}" | cut -d'@' -f1 | cut -d':' -f1)
           digest=$(echo "${image_and_digest}" | cut -d'@' -f2)
           echo "name=$image" >> "$GITHUB_OUTPUT"
+          echo $image
           echo "digest=$digest" >> "$GITHUB_OUTPUT"
+          echo $digest
 
-  provenance-image:
-    needs: [ build-image ]
-    permissions:
-      actions: read
-      id-token: write
-      packages: write
-    uses: slsa-framework/slsa-github-generator/.github/workflows/generator_container_slsa3.yml@v2.0.0
-    with:
-      image: ${{ needs.build-image.outputs.image }}
-      digest: ${{ needs.build-image.outputs.digest }}
-      registry-username: ${{ github.actor }}
-      compile-generator: true
-    secrets:
-      registry-password: ${{ secrets.GITHUB_TOKEN }}
+#  provenance-image:
+#    needs: [ build-image ]
+#    permissions:
+#      actions: read
+#      id-token: write
+#      packages: write
+#    uses: slsa-framework/slsa-github-generator/.github/workflows/generator_container_slsa3.yml@v2.0.0
+#    with:
+#      image: ${{ needs.build-image.outputs.image }}
+#      digest: ${{ needs.build-image.outputs.digest }}
+#      registry-username: ${{ github.actor }}
+#      compile-generator: true
+#    secrets:
+#      registry-password: ${{ secrets.GITHUB_TOKEN }}
