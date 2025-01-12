@@ -1,0 +1,95 @@
+version: 2
+project_name: slsa-test
+
+before:
+  hooks:
+    - go mod tidy
+
+builds:
+  - id: slsa-test
+    env:
+      - CGO_ENABLED=0
+    main: ./cmd/main.go
+    binary: slsa-test
+    goos:
+      - linux
+      - darwin
+    goarch:
+      - amd64
+      - arm64
+    ldflags:
+      - -X main.gitTag={{.Tag}}
+
+dockers:
+  - id: slsa-test-amd64
+    image_templates:
+      - "ghcr.io/clover0/slsa-test-amd64:{{ .Tag }}"
+    ids:
+      - slsa-test
+    use: buildx
+    goos: linux
+    goarch: amd64
+    dockerfile: Dockerfile
+    build_flag_templates:
+      - "--platform=linux/amd64"
+      - "--label=org.opencontainers.image.description={{.ProjectName}}"
+      - "--label=org.opencontainers.image.created={{.Date}}"
+      - "--label=org.opencontainers.image.title={{.ProjectName}}"
+      - "--label=org.opencontainers.image.revision={{.FullCommit}}"
+      - "--label=org.opencontainers.image.version={{.Version}}"
+  - id: slsa-test-arm64
+    image_templates:
+      - "ghcr.io/clover0/slsa-test-arm64v8:{{ .Tag }}"
+    ids:
+      - slsa-test
+    use: buildx
+    goos: linux
+    goarch: arm64
+    dockerfile: Dockerfile
+    build_flag_templates:
+      - "--platform=linux/arm64/v8"
+      - "--label=org.opencontainers.image.description={{.ProjectName}}"
+      - "--label=org.opencontainers.image.created={{.Date}}"
+      - "--label=org.opencontainers.image.title={{.ProjectName}}"
+      - "--label=org.opencontainers.image.revision={{.FullCommit}}"
+      - "--label=org.opencontainers.image.version={{.Version}}"
+
+docker_manifests:
+  - name_template: "ghcr.io/clover0/slsa-test:{{ .Tag }}"
+    id: slsa-test-mani
+    image_templates:
+      - "ghcr.io/clover0/slsa-test-amd64:{{ .Tag }}"
+      - "ghcr.io/clover0/slsa-test-arm64v8:{{ .Tag }}"
+
+signs:
+  - cmd: cosign
+    artifacts: checksum
+    certificate: ${artifact}.pem
+    signature: ${artifact}.sig
+    args:
+      - "sign-blob"
+      - "--output-certificate=${certificate}"
+      - "--output-signature=${signature}"
+      - "--oidc-provider"
+      - "github"
+      - "${artifact}"
+      - "--yes"
+
+docker_signs:
+  - cmd: cosign
+    ids:
+      - slsa-test-mani
+    artifacts: manifests
+    args:
+      - "sign"
+      - "${artifact}"
+      - "--yes"
+
+archives:
+  - format: tar.gz
+    name_template: >-
+      {{ .ProjectName }}_{{ .Os }}_{{ .Arch }}
+      {{- if .Arm }}v{{ .Arm }}{{ end }}
+
+release:
+  prerelease: true

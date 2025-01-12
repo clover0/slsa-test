@@ -1,7 +1,13 @@
 package main
 
-import "fmt"
+import (
+	"fmt"
+	"slsa-test/pkg/hello"
+)
+
+var gitTag = "dev"
 
 func main() {
-	fmt.Println("Hello, World!")
+	hello.Hello()
+	fmt.Println("git tag: ", gitTag)
 }
