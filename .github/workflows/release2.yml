@@ -114,6 +114,7 @@ jobs:
           ARTIFACTS: "${{ steps.goreleaser.outputs.artifacts }}"
         run: |
           set -euo pipefail
+          echo $ARTIFACTS
           sha_digest=$(echo "$ARTIFACTS" |  jq -re 'first(.[] | select(.goarch == "amd64" and .type == "Published Docker Image")) | .extra.Digest')
           echo sha_digest $sha_digest
           digest=$(echo "${sha_digest}" | cut -d':' -f2)

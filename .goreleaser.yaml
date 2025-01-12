@@ -32,6 +32,7 @@ dockers:
     dockerfile: Dockerfile
     build_flag_templates:
       - "--platform=linux/amd64"
+      - "--label=org.opencontainers.image.description={{.ProjectName}}"
       - "--label=org.opencontainers.image.created={{.Date}}"
       - "--label=org.opencontainers.image.title={{.ProjectName}}"
       - "--label=org.opencontainers.image.revision={{.FullCommit}}"
@@ -48,6 +49,7 @@ dockers:
     dockerfile: Dockerfile
     build_flag_templates:
       - "--platform=linux/amd64"
+      - "--label=org.opencontainers.image.description={{.ProjectName}}"
       - "--label=org.opencontainers.image.created={{.Date}}"
       - "--label=org.opencontainers.image.title={{.ProjectName}}"
       - "--label=org.opencontainers.image.revision={{.FullCommit}}"
@@ -55,6 +57,8 @@ dockers:
 
 signs:
   - cmd: cosign
+    ids:
+      - slsa-test
     artifacts: checksum
     certificate: ${artifact}.pem
     signature: ${artifact}.sig
@@ -64,6 +68,17 @@ signs:
       - "--output-signature=${signature}"
       - "--oidc-provider"
       - "github"
+      - "${artifact}"
+      - "--yes"
+
+docker_signs:
+  - cmd: cosign
+    ids:
+      - slsa-test-amd64
+      - slsa-test-arm64
+    artifacts: manifests
+    args:
+      - "sign"
       - "${artifact}"
       - "--yes"
 
