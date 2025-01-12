@@ -55,6 +55,7 @@ dockers:
 
 docker_manifests:
   - name_template: "ghcr.io/clover0/slsa-test:{{ .Tag }}"
+    id: slsa-test-mani
     image_templates:
       - "ghcr.io/clover0/slsa-test-amd64:{{ .Tag }}"
       - "ghcr.io/clover0/slsa-test-arm64:{{ .Tag }}"
@@ -76,8 +77,7 @@ signs:
 docker_signs:
   - cmd: cosign
     ids:
-      - slsa-test-amd64
-      - slsa-test-arm64
+      - slsa-test-mani
     artifacts: manifests
     args:
       - "sign"
