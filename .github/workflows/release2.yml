@@ -117,9 +117,9 @@ jobs:
           image_and_tag=$(echo "$ARTIFACTS" | jq -er '.[] | select (.type=="Docker Manifest") | .path')
           image=$(echo "${image_and_tag}" | cut -d':' -f1)
           sha_digest=$(echo "$ARTIFACTS" |  jq -re '.[] | select (.type=="Docker Manifest") | .extra.Digest')
-          digest=$(echo "${sha_digest}" | cut -d':' -f2)
+          #digest=$(echo "${sha_digest}" | cut -d':' -f2)
           echo "name=$image" >> "$GITHUB_OUTPUT"
-          echo "digest=$digest" >> "$GITHUB_OUTPUT"
+          echo "digest=$sha_digest" >> "$GITHUB_OUTPUT"
 #
 #      - name: Output arm64 digest
 #        id: image-arm64
