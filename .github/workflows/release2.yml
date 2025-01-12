@@ -119,6 +119,12 @@ jobs:
           echo "name=$image" >> "$GITHUB_OUTPUT"
           echo "digest=$sha_digest" >> "$GITHUB_OUTPUT"
 
+      - uses: actions/attest-build-provenance@7668571508540a607bdfd90a87a560489fe372eb # v2.1.0
+        with:
+          subject-name: ghcr.io/clover0/slsa-test
+          subject-digest: ${{ steps.image.outputs.digest }}
+          push-to-registry: true
+
   provenance-image:
     needs: [ build-image ]
     permissions:
