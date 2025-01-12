@@ -6,7 +6,8 @@ before:
     - go mod tidy
 
 builds:
-  - env:
+  - id: slsa-test
+    env:
       - CGO_ENABLED=0
       - GO111MODULE=on
     main: ./cmd/main.go
@@ -23,6 +24,8 @@ dockers:
     image_templates:
       - "clover0/slsa-test:latest"
       - "clover0/slsa-test:{{ .Tag }}"
+    ids:
+      - slsa-test
     use: buildx
     goos: linux
     goarch: amd64

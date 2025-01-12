@@ -2,9 +2,6 @@ FROM golang:1.23.3-bookworm AS builder
 
 WORKDIR /app
 
-COPY . /app
+COPY slsa-test /app/slsa-test
 
-RUN ls -l /app/go.mod
-
-RUN go mod download
-RUN cd cmd && go build -o /app/bin/app
+ENTRYPOINT ["/app/slsa-test"]
