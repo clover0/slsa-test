@@ -93,3 +93,22 @@ archives:
 
 release:
   prerelease: true
+
+brews:
+  - name: {{ .ProjectName }}
+    ids:
+      - slsa-test
+    skip_upload: auto
+    commit_msg_template: "Brew formula update for {{ .ProjectName }} version {{ .Tag }}"
+    repository:
+      owner: clover0
+      name: homebrew-slsa-test
+      token: "{{ .Env.GITHUB_PERSONAL_AUTH_TOKEN }}"
+      pull_request:
+        enabled: true
+        base:
+          owner: clover0
+          name: homebrew-slsa-test
+          branch: main
+    test: |
+      system "#{bin}/issue-agent --version"
