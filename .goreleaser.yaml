@@ -93,11 +93,9 @@ archives:
 
 release:
   prerelease: true
-<<<<<<< Updated upstream
-=======
 
 brews:
-  - name: {{ .ProjectName }}
+  - name: "{{ .ProjectName }}"
     ids:
       - slsa-test
     skip_upload: auto
@@ -114,4 +112,3 @@ brews:
           branch: main
     test: |
       system "#{bin}/issue-agent --version"
->>>>>>> Stashed changes
