@@ -96,8 +96,6 @@ release:
 
 brews:
   - name: "{{ .ProjectName }}"
-    ids:
-      - slsa-test
     skip_upload: auto
     commit_msg_template: "Brew formula update for {{ .ProjectName }} version {{ .Tag }}"
     repository:
