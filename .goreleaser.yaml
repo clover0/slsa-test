@@ -93,3 +93,25 @@ archives:
 
 release:
   prerelease: true
+<<<<<<< Updated upstream
+=======
+
+brews:
+  - name: {{ .ProjectName }}
+    ids:
+      - slsa-test
+    skip_upload: auto
+    commit_msg_template: "Brew formula update for {{ .ProjectName }} version {{ .Tag }}"
+    repository:
+      owner: clover0
+      name: homebrew-slsa-test
+      token: "{{ .Env.HOMEBREW_GITHUB_TOKEN }}"
+      pull_request:
+        enabled: true
+        base:
+          owner: clover0
+          name: homebrew-slsa-test
+          branch: main
+    test: |
+      system "#{bin}/issue-agent --version"
+>>>>>>> Stashed changes
