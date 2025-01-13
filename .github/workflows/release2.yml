@@ -9,7 +9,6 @@ permissions: { }
 
 jobs:
   build-image:
-    if: github.base_ref == 'main'
     permissions:
       contents: write
       id-token: write
